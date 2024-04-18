@@ -14,9 +14,6 @@ class UserController extends Controller
     private const VALIDATION_RULE_NAME = 'required|max:100';
     private const VALIDATION_RULE_PASSWORD = 'min:5|max:40';
 
-    protected $base_url = '/admin/users';
-    protected $view_path = '/admin/user';
-
     private $validation_messages = [
         'fullname.required' => 'Nama harus diisi.',
         'fullname.max' => 'Nama terlalu panjang, maksimal 100 karakter.',
@@ -33,7 +30,7 @@ class UserController extends Controller
     public function index()
     {
         $items = User::orderBy('fullname', 'asc')->get();
-        return $this->view('index', compact('items'));
+        return view('admin.users.index', compact('items'));
     }
 
     public function edit(Request $request, $id = 0)
@@ -41,9 +38,9 @@ class UserController extends Controller
         $user = (int)$id == 0 ? new User() : User::find($id);
 
         if (!$user)
-            return $this->redirect()->with('warning', 'Pengguna tidak ditemukan.');
+            return redirect('admin/users')->with('warning', 'Pengguna tidak ditemukan.');
         else if ($user->username == 'admin')
-            return $this->redirect()->with('warning', 'Akun <b>' . $user->username . '</b> tidak boleh diubah.');
+            return redirect('admin/users')->with('warning', 'Akun <b>' . $user->username . '</b> tidak boleh diubah.');
 
         if ($request->method() == 'POST') {
             $rules = ['fullname' => self::VALIDATION_RULE_NAME];
@@ -78,12 +75,12 @@ class UserController extends Controller
 
             $user->save();
 
-            return $this->redirect()->with('info', $message);
+            return redirect('admin/users')->with('info', $message);
         }
 
         $groups = UserGroup::orderBy('name', 'asc')->get();
 
-        return $this->view('edit', compact('user', 'groups'));
+        return view('admin.users.edit', compact('user', 'groups'));
     }
 
     public function profile(Request $request)
@@ -111,10 +108,10 @@ class UserController extends Controller
 
             $user->update($request->only($changedFields));
 
-            return $this->redirect('profile')->with('info', 'Profil anda telah diperbarui.');
+            return redirect('admin/users/profile')->with('info', 'Profil anda telah diperbarui.');
         }
 
-        return $this->view('profile', compact('user'));
+        return view('admin.users.profile', compact('user'));
     }
 
     public function delete(Request $request, $id)
@@ -122,15 +119,15 @@ class UserController extends Controller
         $user = User::findOrFail($id);
 
         if ($user->username == 'admin')
-            return $this->redirect()->with('error', 'Akun ' . e($user->username) . ' tidak boleh dihapus.');
+            return redirect('admin/users')->with('error', 'Akun ' . e($user->username) . ' tidak boleh dihapus.');
         else if ($user->id == Auth::user()->id)
-            return $this->redirect()->with('error', 'Anda tidak dapat menghapus akun sendiri.');
+            return redirect('admin/users')->with('error', 'Anda tidak dapat menghapus akun sendiri.');
 
         if ($request->method() == 'POST') {
             $user->delete();
-            return $this->redirect()->with('info', 'Akun ' . e($user->username) . ' telah dihapus.');
+            return redirect('admin/users')->with('info', 'Akun ' . e($user->username) . ' telah dihapus.');
         }
 
-        return $this->view('delete', compact('user'));
+        return view('admin.users.delete', compact('user'));
     }
 }

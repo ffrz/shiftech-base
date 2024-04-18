@@ -9,20 +9,17 @@ use Illuminate\Support\Facades\Validator;
 
 class UserGroupController extends Controller
 {
-    protected $base_url = '/admin/user-groups';
-    protected $view_path = '/admin/user-group';
-
     public function index()
     {
         $items = UserGroup::orderBy('name', 'asc')->get();
-        return $this->view('index', compact('items'));
+        return view('admin.user-groups.index', compact('items'));
     }
 
     public function edit(Request $request, $id = 0)
     {
         $group = $id ? UserGroup::find($id) : new UserGroup();
         if (!$group)
-            return $this->redirect()->with('warning', 'Grup Pengguna tidak ditemukan.');
+            return redirect('admin/user-groups')->with('warning', 'Grup Pengguna tidak ditemukan.');
 
         if ($request->method() == 'POST') {
             $validator = Validator::make($request->all(), [
@@ -39,10 +36,10 @@ class UserGroupController extends Controller
             $group->fill($request->all());
             $group->save();
 
-            return $this->redirect()->with('info', 'Grup pengguna telah disimpan.');
+            return redirect('admin/user-groups')->with('info', 'Grup pengguna telah disimpan.');
         }
 
-        return $this->view('edit', compact('group'));
+        return view('admin.user-groups.edit', compact('group'));
     }
 
     public function delete($id)
@@ -52,6 +49,6 @@ class UserGroupController extends Controller
         else if ($userGroup->delete($id))
             $message = 'Grup pengguna ' . $userGroup->name . ' telah dihapus.';
 
-        return $this->redirect()->with('info', $message);
+        return redirect('admin/user-groups')->with('info', $message);
     }
 }

@@ -23,11 +23,11 @@
             <td>:</td>
             <td>{{ empty($user->fullname) ? '-' : $user->fullname }}</td>
           </tr>
-          {{-- <tr>
+          <tr>
             <td>Grup</td>
             <td>:</td>
-            <td>{{ $user->group->name }}</td>
-          </tr> --}}
+            <td>@if ($user->group) {{ $user->group->name }} @else <i class="text-muted">{{ '-tidak memiliki grup' }}</i> @endif</td>
+          </tr>
           <tr>
             <td>Status Akun</td>
             <td>:</td>
@@ -44,7 +44,7 @@
         <div>
           <a href="{{ url('/admin/users') }}" class="btn btn-default mr-2"><i class="fas fa-arrow-left mr-1"></i>
             Kembali</a>
-          <button type="submit" class="btn btn-danger"><i class="fas fa-trash-can mr-1"></i> HAPUS</button>
+          <button type="submit" class="btn btn-danger" onclick="return confirm('Anda yakin akan menghapus akun ini?')"><i class="fas fa-trash-can mr-1"></i> HAPUS</button>
         </div>
       </div>
     </form>
