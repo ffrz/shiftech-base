@@ -69,9 +69,9 @@ class UserController extends Controller
             $user->fill($data);
 
             if (!$id)
-                $message = 'Akun pengguna ' . $data['username'] . ' telah dibuat.';
+                $message = 'Akun pengguna <b>' . $data['username'] . '</b> telah dibuat.';
             else
-                $message = 'Akun pengguna ' . $data['username'] . ' telah diperbarui.';
+                $message = 'Akun pengguna <b>' . $data['username'] . '</b> telah diperbarui.';
 
             $user->save();
 
@@ -119,13 +119,13 @@ class UserController extends Controller
         $user = User::findOrFail($id);
 
         if ($user->username == 'admin')
-            return redirect('admin/users')->with('error', 'Akun ' . e($user->username) . ' tidak boleh dihapus.');
+            return redirect('admin/users')->with('error', 'Akun <b>' . e($user->username) . '</b> tidak boleh dihapus.');
         else if ($user->id == Auth::user()->id)
             return redirect('admin/users')->with('error', 'Anda tidak dapat menghapus akun sendiri.');
 
         if ($request->method() == 'POST') {
             $user->delete();
-            return redirect('admin/users')->with('info', 'Akun ' . e($user->username) . ' telah dihapus.');
+            return redirect('admin/users')->with('info', 'Akun <b>' . e($user->username) . '</b> telah dihapus.');
         }
 
         return view('admin.users.delete', compact('user'));
