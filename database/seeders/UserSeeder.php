@@ -27,12 +27,12 @@ class UserSeeder extends Seeder
             'group_id' => 1,
         ]);
         User::insert([
-            'username' => 'maintainer',
+            'username' => 'operator1',
             'password' => Hash::make('12345'),
             'is_active' => true,
             'is_admin' => false,
-            'fullname' => 'Maintainer',
-            'group_id' => 4,
+            'fullname' => 'Operator 1',
+            'group_id' => 2,
         ]);
     }
 }

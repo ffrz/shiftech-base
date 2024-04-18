@@ -16,9 +16,7 @@ class UserGroupSeeder extends Seeder
         Schema::disableForeignKeyConstraints();
         UserGroup::truncate();
         Schema::enableForeignKeyConstraints();
-        UserGroup::insert(['id' => 1, 'name' => 'System Administrator']);
-        UserGroup::insert(['id' => 2, 'name' => 'Administrator']);
-        UserGroup::insert(['id' => 3, 'name' => 'Owner']);
-        UserGroup::insert(['id' => 4, 'name' => 'Maintainer']);
+        UserGroup::insert(['id' => 1, 'name' => 'Administrator / Owner']);
+        UserGroup::insert(['id' => 2, 'name' => 'Operator']);
     }
 }
