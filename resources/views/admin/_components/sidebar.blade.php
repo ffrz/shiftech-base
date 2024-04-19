@@ -32,6 +32,12 @@ if (!isset($menu_active)) {
             </a>
             <ul class="nav nav-treeview">
               <li class="nav-item">
+                <a href="{{ url('/admin/sys-events') }}" class="nav-link {{ $nav_active == 'sys-events' ? 'active' : '' }}">
+                  <i class="nav-icon fas fa-file-waveform"></i>
+                  <p>Log Aktivitas</p>
+                </a>
+              </li>
+              <li class="nav-item">
                 <a href="{{ url('/admin/users') }}" class="nav-link {{ $nav_active == 'users' ? 'active' : '' }}">
                   <i class="nav-icon fas fa-users"></i>
                   <p>Pengguna</p>

@@ -3,11 +3,13 @@
 use App\Http\Controllers\Admin\AuthController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\SettingsController;
+use App\Http\Controllers\Admin\SysEventController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\UserGroupController;
 use App\Http\Middleware\Authenticate;
 use App\Http\Middleware\OnlyAdmin;
 use App\Http\Middleware\OnlyGuest;
+
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -53,6 +55,12 @@ Route::middleware([Authenticate::class, OnlyAdmin::class])->prefix('admin')->gro
         Route::match(['get', 'post'], 'edit/{id}', 'edit');
         Route::match(['get', 'post'], 'delete/{id}', 'delete');
         Route::match(['get', 'post'], 'profile', 'profile');
+    });
+
+    Route::controller(SysEventController::class)->prefix('sys-events')->group(function () {
+        Route::get('', 'index');
+        Route::get('show/{id}', 'show');
+        Route::post('delete', 'delete');
     });
 
 });

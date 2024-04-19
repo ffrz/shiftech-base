@@ -14,8 +14,9 @@ class AuthController extends Controller
     {
         $user = Auth::user();
         Auth::logout();
-        if ($user)
-            SysEvent::log(SysEvent::AUTHENTICATION, 'Logout', 'Pengguna telah logout.', null, $user->username);
+        if ($user) {
+            SysEvent::log(SysEvent::AUTHENTICATION, 'Logout', 'Logout sukses. Pengguna ' . e($user->username) . ' telah logout.', null, $user->username);
+        }
         $request->session()->invalidate();
         $request->session()->regenerateToken();
     }
@@ -39,14 +40,17 @@ class AuthController extends Controller
             return redirect()->back()->withInput()->withErrors($validator);
 
         $error = '';
-        if (!Auth::attempt($request->only(['username', 'password']))) {
+        $data = $request->only(['username', 'password']);
+        if (!Auth::attempt($data)) {
             $error = 'Username atau password salah!';
+            SysEvent::log(SysEvent::AUTHENTICATION, 'Login', 'Login gagal. Pengguna dengan username <b>' . e($request->post('username')) . '</b> mencoba login.');
         } else if (!Auth::user()->is_active) {
             $error = 'Akun anda tidak aktif. Silahkan hubungi administrator!';
+            SysEvent::log(SysEvent::AUTHENTICATION, 'Login', 'Login gagal. Pengguna tidak aktif dengan username <b>' . e($request->post('username')) . '</b> mencoba login.');
             $this->_logout($request);
         } else {
             $request->session()->regenerate();
-            SysEvent::log(SysEvent::AUTHENTICATION, 'Login', 'Pengguna telah login.');
+            SysEvent::log(SysEvent::AUTHENTICATION, 'Login', 'Login sukses. Pengguna ' . e(Auth::user()->username) . ' telah login.');
             return redirect('/admin/dashboard');
         }
 
