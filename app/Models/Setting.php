@@ -22,6 +22,7 @@ class Setting extends Model
         'value',
         'lastmod_datetime',
         'lastmod_user_id',
+        'lastmod_username',
     ];
 
     static $settings = [];
@@ -56,9 +57,10 @@ class Setting extends Model
         ], [
             'value' => $value,
             'lastmod_datetime' => now(),
-            'lastmod_user_id' => Auth::user()->id
+            'lastmod_user_id' => Auth::user()->id,
+            'lastmod_username' => Auth::user()->username,
         ]);
 
-        static::$settings['key'] = $value;
+        static::$settings[$key] = $value;
     }
 }
