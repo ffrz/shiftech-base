@@ -3,16 +3,19 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\SysEvent;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Validator;
 
 class AuthController extends Controller
 {
     private function _logout(Request $request)
     {
+        $user = Auth::user();
         Auth::logout();
+        if ($user)
+            SysEvent::log(SysEvent::AUTHENTICATION, 'Logout', 'Pengguna telah logout.', null, $user->username);
         $request->session()->invalidate();
         $request->session()->regenerateToken();
     }
@@ -43,6 +46,7 @@ class AuthController extends Controller
             $this->_logout($request);
         } else {
             $request->session()->regenerate();
+            SysEvent::log(SysEvent::AUTHENTICATION, 'Login', 'Pengguna telah login.');
             return redirect('/admin/dashboard');
         }
 
