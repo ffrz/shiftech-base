@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Setting;
+use App\Models\SysEvent;
+use Illuminate\Database\Eloquent\JsonEncodingException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
@@ -32,12 +34,21 @@ class SettingsController extends Controller
         if ($validator->fails())
             return redirect()->back()->withInput()->withErrors($validator);
 
+        $oldValues = Setting::values();
+
         DB::beginTransaction();
         Setting::setValue('app.business_name', $request->post('business_name', ''));
         Setting::setValue('app.business_address', $request->post('business_address', ''));
         Setting::setValue('app.business_phone', $request->post('business_phone', ''));
         Setting::setValue('app.business_owner', $request->post('business_owner', ''));
         DB::commit();
+
+        $data = [
+            'Old Value' => $oldValues,
+            'New Value' => Setting::values(),
+        ];
+
+        SysEvent::log(SysEvent::SETTINGS, 'Change Settings', 'Pengaturan telah diperbarui.', $data);
 
         return redirect('admin/settings')->with('info', 'Pengaturan telah disimpan.');
     }
