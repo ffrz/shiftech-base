@@ -67,7 +67,7 @@
   <script>
     $(function() {
       DATATABLES_OPTIONS.order = [
-        [0, 'asc']
+        [0, 'desc']
       ];
       DATATABLES_OPTIONS.columnDefs = [{
         orderable: false,
