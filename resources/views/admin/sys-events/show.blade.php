@@ -39,7 +39,7 @@
         <tr>
           <td>Deskripsi / Pesan</td>
           <td>:</td>
-          <td>{{ $item->description }}</td>
+          <td>{!! $item->description !!}</td>
         </tr>
         <tr>
           <td>Data</td>
