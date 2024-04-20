@@ -10,7 +10,10 @@ class SysEventController extends Controller
 {
     public function index()
     {
-        $items = SysEvent::all();
+        $q = SysEvent::query();
+        $q->orderBy('id', 'desc');
+        $items = $q->get();
+        
         return view('admin.sys-events.index', compact('items'));
     }
 
