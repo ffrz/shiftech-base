@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\SysEvent;
 use App\Models\UserGroup;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -33,9 +34,18 @@ class UserGroupController extends Controller
             if ($validator->fails())
                 return redirect()->back()->withInput()->withErrors($validator);
 
+            $data = ['Old Data' => $group->toArray()];
             $group->fill($request->all());
             $group->save();
+            $data['New Data'] = $group->toArray();
 
+            SysEvent::log(
+                SysEvent::USERGROUP_MANAGEMENT,
+                ($id == 0 ? 'Tambah' : 'Perbarui') . ' Grup Pengguna',
+                'Grup pengguna ' . e($group->name) . ' telah ' . ($id == 0 ? 'dibuat' : 'diperbarui'),
+                $data
+            );
+            
             return redirect('admin/user-groups')->with('info', 'Grup pengguna telah disimpan.');
         }
 
@@ -44,10 +54,17 @@ class UserGroupController extends Controller
 
     public function delete($id)
     {
-        if (!$userGroup = UserGroup::find($id))
+        if (!$group = UserGroup::find($id))
             $message = 'Grup pengguna tidak ditemukan.';
-        else if ($userGroup->delete($id))
-            $message = 'Grup pengguna ' . $userGroup->name . ' telah dihapus.';
+        else if ($group->delete($id)) {
+            $message = 'Grup pengguna ' . e($group->name) . ' telah dihapus.';
+            SysEvent::log(
+                SysEvent::USERGROUP_MANAGEMENT,
+                'Hapus Grup Pengguna',
+                $message,
+                $group->toArray()
+            );
+        }
 
         return redirect('admin/user-groups')->with('info', $message);
     }

@@ -43,10 +43,10 @@ class AuthController extends Controller
         $data = $request->only(['username', 'password']);
         if (!Auth::attempt($data)) {
             $error = 'Username atau password salah!';
-            SysEvent::log(SysEvent::AUTHENTICATION, 'Login', 'Login gagal. Pengguna dengan username <b>' . e($request->post('username')) . '</b> mencoba login.');
+            SysEvent::log(SysEvent::AUTHENTICATION, 'Login', 'Login gagal. Pengguna dengan username ' . e($request->post('username')) . ' mencoba login.');
         } else if (!Auth::user()->is_active) {
             $error = 'Akun anda tidak aktif. Silahkan hubungi administrator!';
-            SysEvent::log(SysEvent::AUTHENTICATION, 'Login', 'Login gagal. Pengguna tidak aktif dengan username <b>' . e($request->post('username')) . '</b> mencoba login.');
+            SysEvent::log(SysEvent::AUTHENTICATION, 'Login', 'Login gagal. Pengguna tidak aktif dengan username ' . e($request->post('username')) . ' mencoba login.');
             $this->_logout($request);
         } else {
             $request->session()->regenerate();

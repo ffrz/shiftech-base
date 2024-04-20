@@ -31,8 +31,9 @@ class SettingsController extends Controller
             'business_name.required' => 'Nama Usaha harus diisi.'
         ]);
 
-        if ($validator->fails())
+        if ($validator->fails()) {
             return redirect()->back()->withInput()->withErrors($validator);
+        }
 
         $oldValues = Setting::values();
 

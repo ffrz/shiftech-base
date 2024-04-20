@@ -38,18 +38,22 @@ class UserController extends Controller
     {
         $user = (int)$id == 0 ? new User() : User::find($id);
 
-        if (!$user)
+        if (!$user) {
             return redirect('admin/users')->with('warning', 'Pengguna tidak ditemukan.');
-        else if ($user->username == 'admin')
+        }
+        else if ($user->username == 'admin') {
             return redirect('admin/users')->with('warning', 'Akun <b>' . $user->username . '</b> tidak boleh diubah.');
+        }
 
         if ($request->method() == 'POST') {
             $rules = ['fullname' => self::VALIDATION_RULE_NAME];
 
-            if (!$id)
+            if (!$id) {
                 $rules['username'] = 'required|unique:users,username,' . $id . '|min:3|max:40';
-            else if (!empty($request->password))
+            }
+            else if (!empty($request->password)) {
                 $rules['password'] = self::VALIDATION_RULE_PASSWORD;
+            }
 
             $data = $request->all();
 
@@ -67,18 +71,21 @@ class UserController extends Controller
             if (empty($data['group_id']))
                 $data['group_id'] = null;
 
+            if (empty($request->password))
+                unset($data['password']);
+
             $user->fill($data);
 
             if (!$id) {
-                $message = 'Akun pengguna <b>' . $data['username'] . '</b> telah dibuat.';
+                $message = 'Akun pengguna ' . $data['username'] . ' telah dibuat.';
             }
             else {
-                $message = 'Akun pengguna <b>' . $data['username'] . '</b> telah diperbarui.';
+                $message = 'Akun pengguna ' . $data['username'] . ' telah diperbarui.';
             }
 
             $user->save();
 
-            SysEvent::log(SysEvent::USER_MANAGEMENT, ($id == 0 ? 'Tambah ' : 'Perbarui') . ' Pengguna', $message);
+            SysEvent::log(SysEvent::USER_MANAGEMENT, ($id == 0 ? 'Tambah' : 'Perbarui') . ' Pengguna', $message);
 
             return redirect('admin/users')->with('info', $message);
         }
@@ -108,8 +115,9 @@ class UserController extends Controller
 
             $validator = Validator::make($request->all(), $rules, $this->validation_messages);
 
-            if ($validator->fails())
+            if ($validator->fails()) {
                 return redirect()->back()->withInput()->withErrors($validator);
+            }
 
             $user->update($request->only($changedFields));
 
