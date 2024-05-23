@@ -25,9 +25,9 @@ class SettingsController extends Controller
     public function save(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'school_name' => 'required'
+            'company_name' => 'required'
         ], [
-            'school_name.required' => 'Nama Sekolah harus diisi.'
+            'company_name.required' => 'Nama Perusahaan harus diisi.'
         ]);
 
         if ($validator->fails()) {
@@ -39,9 +39,9 @@ class SettingsController extends Controller
         DB::beginTransaction();
 
         // app
-        Setting::setValue('school.name', $request->post('school_name', ''));
-        Setting::setValue('school.address', $request->post('school_address', ''));
-        Setting::setValue('school.phone', $request->post('school_phone', ''));
+        Setting::setValue('company.name', $request->post('company_name', ''));
+        Setting::setValue('company.address', $request->post('company_address', ''));
+        Setting::setValue('company.phone', $request->post('company_phone', ''));
         DB::commit();
 
         $data = [

@@ -10,9 +10,7 @@ class DashboardController extends Controller
     //
     public function index()
     {
-        $data = [
-            'student_count' => Student::where('status', '=', Student::STATUS_ACTIVE)->count()
-        ];
+        $data = [];
         return view('admin.dashboard.index', compact('data'));
     }
 }

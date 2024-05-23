@@ -8,7 +8,7 @@ if (!isset($menu_active)) {
 ?>
 <aside class="main-sidebar sidebar-light-primary elevation-4">
   <a href="{{ url('/admin') }}" class="brand-link">
-    {{-- <img src="{{ url('dist/img/logo.png') }}" alt="App Logo" class="brand-image img-circle elevation-3" style="opacity: .8"> --}}
+    <img src="{{ url('dist/img/logo.png') }}" alt="App Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
     <span class="brand-text">{{ env('APP_NAME') }}</span>
   </a>
   <div class="sidebar">
@@ -34,50 +34,16 @@ if (!isset($menu_active)) {
             </a>
             <ul class="nav nav-treeview">
               <li class="nav-item">
-                <a href="{{ url('/admin/report/student') }}"
-                  class="nav-link {{ $nav_active == 'student' ? 'active' : '' }}">
+                <a href="#"
+                  class="nav-link {{ $nav_active == 'report-1' ? 'active' : '' }}">
                   <i class="nav-icon fas fa-file-waveform"></i>
-                  <p>Laporan Kesantrian</p>
+                  <p>Laporan 1</p>
                 </a>
               </li>
             </ul>
           </li>
         @endif
         {{-- End Report Menu --}}
-
-        {{-- Master Menu --}}
-        <li class="nav-item {{ $menu_active == 'master' ? 'menu-open' : '' }}">
-          <a href="#" class="nav-link {{ $menu_active == 'master' ? 'active' : '' }}">
-            <i class="nav-icon fas fa-database"></i>
-            <p>
-              Master Data
-              <i class="right fas fa-angle-left"></i>
-            </p>
-          </a>
-          <ul class="nav nav-treeview">
-            <li class="nav-item">
-              <a href="{{ url('/admin/student') }}" class="nav-link {{ $nav_active == 'student' ? 'active' : '' }}">
-                <i class="nav-icon fas fa-user"></i>
-                <p>Santri</p>
-              </a>
-            </li>
-            <li class="nav-item">
-              <a href="{{ url('/admin/school-level') }}"
-                class="nav-link {{ $nav_active == 'school-level' ? 'active' : '' }}">
-                <i class="nav-icon fas fa-layer-group"></i>
-                <p>Kelas</p>
-              </a>
-            </li>
-            <li class="nav-item">
-              <a href="{{ url('/admin/school-stage') }}"
-                class="nav-link {{ $nav_active == 'school-stage' ? 'active' : '' }}">
-                <i class="nav-icon fas fa-layer-group"></i>
-                <p>Tingkat</p>
-              </a>
-            </li>
-          </ul>
-        </li>
-        {{-- End Master Menu --}}
 
         {{-- System Menu --}}
         @if (Auth::user()->canAccess(AclResource::SYSTEM_MENU))
