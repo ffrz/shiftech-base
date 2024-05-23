@@ -3,31 +3,31 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\AclResource;
 use App\Models\Setting;
-use App\Models\SysEvent;
+use App\Models\UserActivity;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
 class SettingsController extends Controller
 {
+    public function __construct()
+    {
+        ensure_user_can_access(AclResource::SETTINGS);
+    }
+    
     public function edit(Request $request)
     {
-        $data = [
-            'business_name' => Setting::value('app.business_name', ''),
-            'business_address' => Setting::value('app.business_address', ''),
-            'business_phone' => Setting::value('app.business_phone', ''),
-            'business_owner' => Setting::value('app.business_owner', ''),
-        ];
-        return view('admin.settings.edit', compact('data'));
+        return view('admin.settings.edit');
     }
 
     public function save(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'business_name' => 'required'
+            'school_name' => 'required'
         ], [
-            'business_name.required' => 'Nama Usaha harus diisi.'
+            'school_name.required' => 'Nama Sekolah harus diisi.'
         ]);
 
         if ($validator->fails()) {
@@ -37,10 +37,11 @@ class SettingsController extends Controller
         $oldValues = Setting::values();
 
         DB::beginTransaction();
-        Setting::setValue('app.business_name', $request->post('business_name', ''));
-        Setting::setValue('app.business_address', $request->post('business_address', ''));
-        Setting::setValue('app.business_phone', $request->post('business_phone', ''));
-        Setting::setValue('app.business_owner', $request->post('business_owner', ''));
+
+        // app
+        Setting::setValue('school.name', $request->post('school_name', ''));
+        Setting::setValue('school.address', $request->post('school_address', ''));
+        Setting::setValue('school.phone', $request->post('school_phone', ''));
         DB::commit();
 
         $data = [
@@ -48,7 +49,7 @@ class SettingsController extends Controller
             'New Value' => Setting::values(),
         ];
 
-        SysEvent::log(SysEvent::SETTINGS, 'Change Settings', 'Pengaturan telah diperbarui.', $data);
+        UserActivity::log(UserActivity::SETTINGS, 'Change Settings', 'Pengaturan telah diperbarui.', $data);
 
         return redirect('admin/settings')->with('info', 'Pengaturan telah disimpan.');
     }

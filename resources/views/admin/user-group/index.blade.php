@@ -1,12 +1,12 @@
 @extends('admin._layouts.default', [
     'title' => 'Grup Pengguna',
     'menu_active' => 'system',
-    'nav_active' => 'user-groups'
+    'nav_active' => 'user-group'
 ])
 
 @section('right-menu')
   <li class="nav-item">
-    <a href="<?= url('/admin/user-groups/edit/0') ?>" class="btn plus-btn btn-primary mr-2" title="Baru"><i
+    <a href="<?= url('/admin/user-group/edit/0') ?>" class="btn plus-btn btn-primary mr-2" title="Baru"><i
         class="fa fa-plus"></i></a>
   </li>
 @endSection
@@ -33,10 +33,10 @@
               <td>{{ $item->description }}</td>
               <td class="text-center">
                 <div class="btn-group">
-                  <a href="<?= url("/admin/user-groups/edit/$item->id") ?>" class="btn btn-default btn-sm"><i
+                  <a href="<?= url("/admin/user-group/edit/$item->id") ?>" class="btn btn-default btn-sm"><i
                       class="fa fa-edit"></i></a>
                   <a onclick="return confirm('Anda yakin akan menghapus rekaman ini?')"
-                    href="<?= url("/admin/user-groups/delete/$item->id") ?>" class="btn btn-danger btn-sm"><i
+                    href="<?= url("/admin/user-group/delete/$item->id") ?>" class="btn btn-danger btn-sm"><i
                       class="fa fa-trash"></i></a>
                 </div>
               </td>
@@ -46,20 +46,14 @@
         </table>
       </div>
     </div>
+    <div class="row">
+      <div class="col-md-6">
+        <p class="text-muted">Menampilkan {{ $items->count() }} rekaman dari total {{ $items->total() }} rekaman.</p>
+      </div>
+      <div class="col-md-6 d-flex justify-content-end">
+        {{ $items->withQueryString()->onEachSide(1)->links('admin._components.paginator') }}
+      </div>
+    </div>
   </div>
 </div>
-@endSection
-@section('footscript')
-<script>
-  $(function() {
-    DATATABLES_OPTIONS.order = [
-      [0, 'asc']
-    ];
-    DATATABLES_OPTIONS.columnDefs = [{
-      orderable: false,
-      targets: 2
-    }];
-    $('.data-table').DataTable(DATATABLES_OPTIONS);
-  });
-</script>
 @endSection

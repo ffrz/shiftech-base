@@ -4,12 +4,14 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="csrf-token" content="{{ csrf_token() }}">
   <title>{{ $title }} - {{ env('APP_NAME') }}</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
   <link rel="stylesheet" href="{{ asset('plugins/fontawesome-free/css/all.min.css') }}">
   <link rel="stylesheet" href="{{ asset('plugins/toastr/toastr.min.css') }}">
   <link rel="stylesheet" href="{{ asset('plugins/pace-progress/themes/blue/pace-theme-flash.css') }}">
   <link rel="stylesheet" href="{{ asset('plugins/select2/css/select2.min.css') }}">
+  <link rel="stylesheet" href="{{ asset('plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css') }}">
   <link rel="stylesheet" href="{{ asset('plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css') }}">
   <link rel="stylesheet" href="{{ asset('plugins/icheck-bootstrap/icheck-bootstrap.min.css') }}">
   <link rel="stylesheet" href="{{ asset('plugins/daterangepicker/daterangepicker.css') }}">
@@ -88,9 +90,17 @@
   <script src="{{ asset('plugins/datatables-buttons/js/buttons.colVis.min.js') }}"></script>
   <script src="{{ asset('plugins/datatables-select/js/dataTables.select.min.js') }}"></script>
   <script src="{{ asset('plugins/datatables-select/js/select.bootstrap4.min.js') }}"></script>
+  <script src="{{ asset('assets/js/helper.js') }}"></script>
   @yield('footscripts')
   <script src="{{ asset('dist/js/adminlte.min.js') }}"></script>
   <script>
+    INPUTMASK_OPTIONS = {
+      groupSeparator: '.',
+      radixPoint: ',',
+      allowMinus: true,
+      inputtype: "text"
+    };
+
     DATE_FORMAT = 'DD-MM-YYYY';
     DATETIME_FORMAT = 'DD-MM-YYYY HH:mm:ss';
     DATATABLES_OPTIONS = {
@@ -137,6 +147,13 @@
     @endif
   </script>
   @yield('footscript')
+  <script type="text/javascript">
+    setInterval(function() {
+      $.get('{{ url('admin/refresh-csrf') }}').done(function(data) {
+        $('[name="csrf-token"]').attr('content', data)
+      });
+    }, 60 * 60 * 1000);
+  </script>
 </body>
 
 </html>

@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\SysEvent;
+use App\Models\UserActivity;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
@@ -15,7 +15,12 @@ class AuthController extends Controller
         $user = Auth::user();
         Auth::logout();
         if ($user) {
-            SysEvent::log(SysEvent::AUTHENTICATION, 'Logout', 'Logout sukses. Pengguna ' . e($user->username) . ' telah logout.', null, $user->username);
+            UserActivity::log(
+                UserActivity::AUTHENTICATION,
+                'Logout',
+                'Logout sukses. Pengguna ' . e($user->username) . ' telah logout.',
+                null, $user->username, $user->id
+            );
         }
         $request->session()->invalidate();
         $request->session()->regenerateToken();
@@ -43,14 +48,14 @@ class AuthController extends Controller
         $data = $request->only(['username', 'password']);
         if (!Auth::attempt($data)) {
             $error = 'Username atau password salah!';
-            SysEvent::log(SysEvent::AUTHENTICATION, 'Login', 'Login gagal. Pengguna dengan username ' . e($request->post('username')) . ' mencoba login.');
+            UserActivity::log(UserActivity::AUTHENTICATION, 'Login', 'Login gagal. Pengguna dengan username ' . e($request->post('username')) . ' mencoba login.');
         } else if (!Auth::user()->is_active) {
             $error = 'Akun anda tidak aktif. Silahkan hubungi administrator!';
-            SysEvent::log(SysEvent::AUTHENTICATION, 'Login', 'Login gagal. Pengguna tidak aktif dengan username ' . e($request->post('username')) . ' mencoba login.');
+            UserActivity::log(UserActivity::AUTHENTICATION, 'Login', 'Login gagal. Pengguna tidak aktif dengan username ' . e($request->post('username')) . ' mencoba login.');
             $this->_logout($request);
         } else {
             $request->session()->regenerate();
-            SysEvent::log(SysEvent::AUTHENTICATION, 'Login', 'Login sukses. Pengguna ' . e(Auth::user()->username) . ' telah login.');
+            UserActivity::log(UserActivity::AUTHENTICATION, 'Login', 'Login sukses. Pengguna ' . e(Auth::user()->username) . ' telah login.');
             return redirect('/admin/dashboard');
         }
 

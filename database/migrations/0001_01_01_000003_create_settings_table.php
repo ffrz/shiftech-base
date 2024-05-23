@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('settings', function (Blueprint $table) {
             $table->string('key')->primary();
-            $table->text('value')->default('');
+            $table->text('value');
             $table->dateTime('lastmod_datetime')->nullable()->default(null);
             $table->unsignedBigInteger('lastmod_user_id')->nullable()->default(null);
             $table->string('lastmod_username')->default('');

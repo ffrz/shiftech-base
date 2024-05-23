@@ -3,11 +3,13 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\SysEvent;
+use App\Models\AclResource;
+use App\Models\UserActivity;
 use App\Models\User;
 use App\Models\UserGroup;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 
 class UserController extends Controller
@@ -26,12 +28,18 @@ class UserController extends Controller
         'password.max' => 'Kata sandi terlalu panjang, maksimal 40 karakter.',
         'password.confirmed' => 'Kata sandi yang anda konfirmasi salah.',
         'password_confirmation.required' => 'Anda belum mengkonfirmasi kata sandi.',
+        'current_password.required' => 'Kata sandi harus diisi.',
     ];
 
+    public function __construct()
+    {
+        ensure_user_can_access(AclResource::USER_MANAGEMENT);
+    }
+    
     public function index()
     {
-        $items = User::orderBy('fullname', 'asc')->get();
-        return view('admin.users.index', compact('items'));
+        $items = User::with('group')->orderBy('fullname', 'asc')->paginate(10);
+        return view('admin.user.index', compact('items'));
     }
 
     public function edit(Request $request, $id = 0)
@@ -39,10 +47,10 @@ class UserController extends Controller
         $user = (int)$id == 0 ? new User() : User::find($id);
 
         if (!$user) {
-            return redirect('admin/users')->with('warning', 'Pengguna tidak ditemukan.');
+            return redirect('admin/user')->with('warning', 'Pengguna tidak ditemukan.');
         }
         else if ($user->username == 'admin') {
-            return redirect('admin/users')->with('warning', 'Akun <b>' . $user->username . '</b> tidak boleh diubah.');
+            return redirect('admin/user')->with('warning', 'Akun <b>' . $user->username . '</b> tidak boleh diubah.');
         }
 
         if ($request->method() == 'POST') {
@@ -85,14 +93,14 @@ class UserController extends Controller
 
             $user->save();
 
-            SysEvent::log(SysEvent::USER_MANAGEMENT, ($id == 0 ? 'Tambah' : 'Perbarui') . ' Pengguna', $message);
+            UserActivity::log(UserActivity::USER_MANAGEMENT, ($id == 0 ? 'Tambah' : 'Perbarui') . ' Pengguna', $message);
 
-            return redirect('admin/users')->with('info', $message);
+            return redirect('admin/user')->with('info', $message);
         }
 
         $groups = UserGroup::orderBy('name', 'asc')->get();
 
-        return view('admin.users.edit', compact('user', 'groups'));
+        return view('admin.user.edit', compact('user', 'groups'));
     }
 
     public function profile(Request $request)
@@ -104,16 +112,21 @@ class UserController extends Controller
             $changedFields = ['fullname'];
             $rules = [
                 'fullname' => self::VALIDATION_RULE_NAME,
+                'current_password' => 'required',
             ];
 
             if (!empty($request->password)) {
                 $changedFields[] = 'password';
-
                 $rules['password'] = self::VALIDATION_RULE_PASSWORD . '|confirmed';
                 $rules['password_confirmation'] = 'required';
             }
 
             $validator = Validator::make($request->all(), $rules, $this->validation_messages);
+
+            if (!Hash::check($request->current_password, $user->password)) {
+                $validator->errors()->add('current_password', 'Password anda salah.');   
+                return redirect()->back()->withInput()->withErrors($validator);
+            }
 
             if ($validator->fails()) {
                 return redirect()->back()->withInput()->withErrors($validator);
@@ -121,12 +134,12 @@ class UserController extends Controller
 
             $user->update($request->only($changedFields));
 
-            SysEvent::log(SysEvent::USER_MANAGEMENT, 'Perbarui Profil Pengguna', 'Profil pengguna ' . e($user->username) . ' telah diperbarui.');
+            UserActivity::log(UserActivity::USER_MANAGEMENT, 'Perbarui Profil Pengguna', 'Profil pengguna ' . e($user->username) . ' telah diperbarui.');
 
-            return redirect('admin/users/profile')->with('info', 'Profil anda telah diperbarui.');
+            return redirect('admin/user/profile')->with('info', 'Profil anda telah diperbarui.');
         }
 
-        return view('admin.users.profile', compact('user'));
+        return view('admin.user.profile', compact('user'));
     }
 
     public function delete(Request $request, $id)
@@ -134,16 +147,16 @@ class UserController extends Controller
         $user = User::findOrFail($id);
 
         if ($user->username == 'admin')
-            return redirect('admin/users')->with('error', 'Akun <b>' . e($user->username) . '</b> tidak boleh dihapus.');
+            return redirect('admin/user')->with('error', 'Akun <b>' . e($user->username) . '</b> tidak boleh dihapus.');
         else if ($user->id == Auth::user()->id)
-            return redirect('admin/users')->with('error', 'Anda tidak dapat menghapus akun sendiri.');
+            return redirect('admin/user')->with('error', 'Anda tidak dapat menghapus akun sendiri.');
 
         if ($request->method() == 'POST') {
             $user->delete();
-            SysEvent::log(SysEvent::USER_MANAGEMENT, 'Hapus Pengguna', 'Akun pengguna ' . e($user->username) . ' telah dihapus.');
-            return redirect('admin/users')->with('info', 'Akun <b>' . e($user->username) . '</b> telah dihapus.');
+            UserActivity::log(UserActivity::USER_MANAGEMENT, 'Hapus Pengguna', 'Akun pengguna ' . e($user->username) . ' telah dihapus.');
+            return redirect('admin/user')->with('info', 'Akun <b>' . e($user->username) . '</b> telah dihapus.');
         }
 
-        return view('admin.users.delete', compact('user'));
+        return view('admin.user.delete', compact('user'));
     }
 }

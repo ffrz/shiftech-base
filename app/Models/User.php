@@ -2,13 +2,10 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
 class User extends Authenticatable
 {
-    use HasFactory;
-
     /**
      * The attributes that are mass assignable.
      *
@@ -45,5 +42,12 @@ class User extends Authenticatable
     public function group()
     {
         return $this->belongsTo(UserGroup::class);
+    }
+
+    public function canAccess($resource)
+    {
+        if ($this->is_admin) return true;
+        $acl = $this->group->acl();
+        return isset($acl[$resource]) && $acl[$resource] == true;
     }
 }
